@@ -1,8 +1,12 @@
 const User = require("../models/user.model")
+const md5 = require("md5");
 
 exports.createUser = async (req, res) => {
     try {
-        const user = new User(req.body);
+        const user = new User({
+            email: req.body.email,
+            password: md5(req.body.password)
+        });
         await user.save();
         res.status(201).json({
             success: true,
@@ -29,7 +33,7 @@ exports.loginUser = async (req, res) => {
             })
         }
 
-        const user = await User.findOne({ $and: [{ email }, { password }] });
+        const user = await User.findOne({ $and: [{ email }, { password: md5(password) }] });
 
         if (!user) {
             return res.status(404).json({
